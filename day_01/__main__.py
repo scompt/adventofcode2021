@@ -19,8 +19,14 @@ def count_increases(numbers: List[int]):
         current = num
     return count
 
+def make_windows(numbers: List[int], window_size:int = 3):
+    for i in range(len(numbers)-window_size+1):
+        yield numbers[i:i+window_size]
+
 if __name__ == "__main__":
     import sys
     numbers = read_number_lines(sys.stdin)
+    windows = make_windows(numbers, 3)
+    numbers = [sum(window) for window in windows]
     increases = count_increases(numbers)
     print(increases)
