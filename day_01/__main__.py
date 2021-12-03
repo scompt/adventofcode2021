@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-
 from typing import List
-from utils import read_number_lines
+from utils import read_lines
+import sys
 
 def count_increases(numbers: List[int]):
     """
@@ -23,10 +22,9 @@ def make_windows(numbers: List[int], window_size:int = 3):
     for i in range(len(numbers)-window_size+1):
         yield numbers[i:i+window_size]
 
-if __name__ == "__main__":
-    import sys
-    numbers = read_number_lines(sys.stdin)
-    windows = make_windows(numbers, 3)
-    numbers = [sum(window) for window in windows]
-    increases = count_increases(numbers)
-    print(increases)
+lines = read_lines(sys.stdin, {"number": int})
+numbers = [line['number'] for line in lines]
+windows = make_windows(numbers, 3)
+numbers = [sum(window) for window in windows]
+increases = count_increases(numbers)
+print(increases)
