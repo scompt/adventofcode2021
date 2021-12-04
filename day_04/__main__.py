@@ -44,6 +44,10 @@ class Card:
         out = "\n"
         for row in chunks(self.numbers, self.card_size):
             for num in row:
+                if num in self.marked_numbers:
+                    out += '*'
+                else:
+                    out += ' '
                 out += str.format("{0: <3}", num)
             out += '\n'
         return out
@@ -60,13 +64,18 @@ def read_input(textio: TextIO, card_size: int) -> Tuple[List[int], List[Card]]:
 
     return numbers, cards
 
-def play_bingo(numbers: List[int], cards:List[Card]):
+def play_bingo(numbers: List[int], cards:List[Card]) -> List[Card]:
+    winners = []
     for number in numbers:
-        for card in cards:
+        # Iterate over cards in reverse since they're being removed while iterating.
+        for card in cards[::-1]: 
             card.mark_number(number)
             if card.is_winner():
-                return card.score()
-    raise Exception("No winner")
+                winners.append(card)
+                cards.remove(card)
+    return winners
             
 numbers, cards = read_input(sys.stdin, int(sys.argv[1]))
-print(play_bingo(numbers, cards))
+winners = play_bingo(numbers, cards)
+print(winners[0].score())
+print(winners[-1].score())
