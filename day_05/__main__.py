@@ -1,24 +1,31 @@
 from typing import TextIO
 import sys
 from collections import namedtuple, defaultdict
-from itertools import takewhile
 
 Point = namedtuple("Point", ['x', 'y'])
 Line = namedtuple("Line", ['from_point', 'to_point'])
 
-def generate_points(line: Line):
-    if not(line.from_point.x == line.to_point.x) and not(line.from_point.y == line.to_point.y):
+def sign(val: int):
+    if val < 0:
+        return -1
+    elif val > 0:
+        return 1
+    else:
+        return 0
+
+def generate_points(line: Line):    
+    x_step = sign(line.to_point.x-line.from_point.x)
+    y_step = sign(line.to_point.y-line.from_point.y)
+
+    if x_step != 0 and y_step != 0:
         return
 
-    min_x = min(line.from_point.x, line.to_point.x)
-    max_x = max(line.from_point.x, line.to_point.x)
-    min_y = min(line.from_point.y, line.to_point.y)
-    max_y = max(line.from_point.y, line.to_point.y)
-    
-    for x in range(min_x, max_x+1):
-        for y in range(min_y, max_y+1):
-            yield Point(x, y)
-        
+    pos = line.from_point
+    end = line.to_point
+    while pos != end:
+        yield pos
+        pos = Point(pos.x+x_step, pos.y+y_step)
+    yield end
 
 def read_input(textio: TextIO):
     max_x = 0
@@ -38,8 +45,6 @@ def read_input(textio: TextIO):
 counts = defaultdict(lambda: 0)
 lines, size = read_input(sys.stdin)
 for line in lines:
-    points = list(generate_points(line))
-    
     for point in generate_points(line):
         counts[point] += 1
 
