@@ -17,9 +17,6 @@ def generate_points(line: Line):
     x_step = sign(line.to_point.x-line.from_point.x)
     y_step = sign(line.to_point.y-line.from_point.y)
 
-    if x_step != 0 and y_step != 0:
-        return
-
     pos = line.from_point
     end = line.to_point
     while pos != end:
