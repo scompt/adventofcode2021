@@ -41,7 +41,9 @@ class Cavern:
             self.flash_count += len(flashes)
             if not flashes:
                 break
-
+        
+        total_energy = sum(self.octopi[loc] for loc in self._points())
+        return total_energy == 0
     
     def _neighbors(self, location: Point):
         for x_delta in [-1, 0, 1]:
@@ -72,7 +74,11 @@ class Cavern:
                 yield Point(x=x,y=y)
 
 cavern = Cavern.read_input(sys.stdin)
-for i in range(100):
+step = 0
+while True:
+    sync = cavern.step()
     print(cavern)
-    cavern.step()
-print(f"Flash count: {cavern.flash_count}")
+    step += 1
+    if sync:
+        print(f"Synced on step {step}")
+        break
