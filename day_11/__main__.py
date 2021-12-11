@@ -1,10 +1,11 @@
-from typing import Generator, TextIO, List, Dict, Tuple, Set
+from typing import Generator, TextIO, Dict
 import sys
-from collections import namedtuple, defaultdict
-import functools
-import operator
+from collections import namedtuple
+import time
 
 Point = namedtuple("Point", ['x', 'y'])
+
+COLORS = [(237, 245, 255), (208, 226, 255), (166, 200, 255), (120, 169, 255), (69, 137, 255), (15, 98, 254), (0, 67, 206), (0, 45, 156), (0, 29, 108), (0, 17, 65)]
 
 class Cavern:
     @staticmethod
@@ -60,11 +61,14 @@ class Cavern:
             for x in range(self.size.x):
                 location = Point(x=x, y=y)
                 energy = self.octopi[location]
-                if energy == 0:
-                    output += '\033[1m'
-                output += str(self.octopi[location])
-                if energy == 0:
-                    output += '\033[0m'
+                output += '\033['
+                # if energy == 0:
+                #     output += '1;'
+                color = COLORS[energy]
+                output += f'38;2;{color[0]};{color[1]};{color[2]}m' 
+                # output += str(self.octopi[location])
+                output += u"\u2588"
+                output += '\033[0m'
             output += '\n'
         return output
 
@@ -76,7 +80,9 @@ class Cavern:
 cavern = Cavern.read_input(sys.stdin)
 step = 0
 while True:
+    time.sleep(2/60)
     sync = cavern.step()
+    print('\033[H')
     print(cavern)
     step += 1
     if sync:
