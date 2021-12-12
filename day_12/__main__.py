@@ -1,4 +1,4 @@
-from typing import TextIO, List, Dict, Tuple, Set
+from typing import TextIO, List, Dict, Tuple
 import sys
 from collections import namedtuple, defaultdict
 
@@ -34,26 +34,41 @@ def read_input(textio: TextIO) -> Tuple[Dict[Node, List[Node]], Node, Node]:
 def print_paths(paths):
     for path in paths:
         print(','.join(node.name for node in path))
-            
-def go(adjacency_list: Dict[Node, List[Node]], path_to_here: List[Node], end: Node, paths, visited):
+
+def already_double_visited_small_node(visited:Dict[Node, int]):
+    ret = sum([1 for node, visit_count in visited.items() if not node.is_big and visit_count>1])
+    return ret>1
+
+def go(adjacency_list: Dict[Node, List[Node]], path_to_here: List[Node], end: Node, paths: List[List[Node]], visited:Dict[Node, int]):
     current_node = path_to_here[-1]
     adjacents = adjacency_list[current_node]
     for node in adjacents:
-        if not node.is_big and node in visited:
-            continue
-        
         next_visited = visited.copy()
-        next_visited.add(node)
+        next_visited[node] += 1
         next_path = list(path_to_here)
         next_path.append(node)
 
+        if node == start:
+            continue
+
         if node == end:
             paths.append(next_path)
-        else:
+        
+        elif node.is_big:
+            # Can always visit big nodes
+            go(adj, next_path, end, paths, next_visited)
+
+        elif visited[node] == 0:
+            # Can always visit small nodes if they haven't been visited before
+            go(adj, next_path, end, paths, next_visited)
+        
+        elif not already_double_visited_small_node(visited):
             go(adj, next_path, end, paths, next_visited)
 
 adj, start, end = read_input(sys.stdin)
 paths = []
-go(adj, [start], end, paths, set([start]))
+visited = defaultdict(lambda:0)
+visited[start] = 2
+go(adj, [start], end, paths, visited)
 print(len(paths))
 # print_paths(paths)
