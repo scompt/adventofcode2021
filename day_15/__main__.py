@@ -4,6 +4,23 @@ import sys
 
 Point = namedtuple("Point", ['x', 'y'])
 
+def tile_cave(cave: Dict[Point, int], size: Point) -> Tuple[Dict[Point, int], Point]:
+    new_cave = dict()
+
+    for y_tile in range(5):
+        for x_tile in range(5):
+            for y in range(size.y):
+                tiled_y = y_tile*size.y + y
+                for x in range(size.x):
+                    old_loc = Point(x=x,y=y)
+                    tiled_x = x_tile*size.x + x
+                    tiled_loc = Point(x=tiled_x, y=tiled_y)
+                    new_cave[tiled_loc] = cave[old_loc] + y_tile + x_tile
+                    if new_cave[tiled_loc] > 9:
+                        new_cave[tiled_loc] -= 9
+    return new_cave, Point(x=size.x*5,y=size.y*5)
+
+
 def read_input(textio: TextIO):
     cave = dict()
     max_x = max_y = 0
@@ -16,7 +33,10 @@ def read_input(textio: TextIO):
             max_y = max(max_y, y)
             cave[loc] = value
     
-    return cave, Point(x=max_x+1, y=max_y+1)
+    size = Point(x=max_x+1, y=max_y+1)
+    cave, size = tile_cave(cave, size)
+
+    return cave, size
 
 def neighbors(location: Point, size: Point):
     for x_delta, y_delta in [(0,1), (0, -1), (1,0), (-1,0)]:
@@ -36,7 +56,7 @@ def visit(cave: Dict[Point, int], size: Point) -> Dict[Point, Tuple[int, Optiona
         if node_to in visited:
             if new_cost < visited[node_to][0]:
                 visited[node_to] = (new_cost, node_from)
-                to_visit.extend(neighbors(node_to, size))
+                to_visit.extend(neighbors(node_to, size))  # This could probably be more efficient
             else:
                 pass
         else:
@@ -71,5 +91,5 @@ finish = Point(x=size.x-1,y=size.y-1)
 visits = visit(cave, size)
 
 path = find_path(cave, visits, finish)
-print_cave(cave, size, path)
+# print_cave(cave, size, path)
 print(visits[finish][0])
