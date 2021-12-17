@@ -58,23 +58,28 @@ class Everything:
         velocity = probe_velocity
         max_height = self.probe_loc.y
         
-        while not self.in_trench() and self.probe_loc.x <= max(self.trench_from.x,self.trench_to.x) and self.probe_loc.y >= max(self.trench_from.y,self.trench_to.y):
+        while not self.in_trench() and self.probe_loc.x <= self.trench_to.x and self.probe_loc.y >= self.trench_from.y:
             self.probe_loc = Point(x=self.probe_loc.x + velocity.x, y=self.probe_loc.y + velocity.y)
             max_height = max(max_height, self.probe_loc.y)
             velocity = Point(x=Everything._drag(velocity.x), y=velocity.y-1)
             # print(self)
-            # print(velocity)
+            # print(velocity, self.probe_loc, self.trench_from, self.trench_to)
+            # print(self.in_trench())
         
         return self.in_trench(), max_height
 
 ev = Everything.read_input(sys.stdin)
-# hit, max_height = ev.simulate(probe_velocity=Point(x=6,y=3))
+# hit, max_height = ev.simulate(probe_velocity=Point(x=6,y=0))
 # print(hit, max_height)
 
-max_hit=0
-for x in range(-2*abs(ev.trench_to.x), 2*abs(ev.trench_to.x)):
-    for y in range(-2*abs(ev.trench_to.y), 2*abs(ev.trench_to.y)):
-        hit, max_height = ev.simulate(probe_velocity=Point(x=x,y=y))
+hits = set()
+for x in range(0, 4*abs(ev.trench_to.x)):
+    for y in range(-4*abs(ev.trench_to.y), 4*abs(ev.trench_to.y)):
+        velocity = Point(x=x,y=y)
+        hit, max_height = ev.simulate(probe_velocity=velocity)
         if hit:
-            max_hit=max(max_hit, max_height)
-print(max_hit)
+            hits.add(velocity)
+# for hit in sorted(list(hits)):
+#     print(hit)
+print(len(hits))
+# print(len(hits), hits)
